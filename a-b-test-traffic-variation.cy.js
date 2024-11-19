@@ -1,13 +1,22 @@
-describe('Teste de CPF em Loop', () => {
+describe('Teste de CPF em Loop com Garantia de Isolabilidade', () => {
   const url = 'https://sua-url-aqui.com';
 
   let contadorCPFObrigatorio = 0;
   let contadorCPFOpcional = 0;
   let contadorDefault = 0;
 
-  it('Realiza verificações de CPF em loop', () => {
+  it('Realiza verificações de CPF em loop com isolamento', () => {
     Cypress._.times(100, () => {
-      cy.visit(url);
+      cy.clearCookies();
+      cy.clearLocalStorage();
+
+      cy.visit(url, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      });
 
       cy.get('body').then(($body) => {
         if ($body.find('seu-seletor-aqui').length > 0) {
@@ -24,7 +33,6 @@ describe('Teste de CPF em Loop', () => {
           contadorDefault += 1;
         }
       });
-
     });
   });
 
